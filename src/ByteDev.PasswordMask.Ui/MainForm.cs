@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ByteDev.Common;
@@ -88,17 +89,17 @@ namespace ByteDev.PasswordMask.Ui
             if (string.IsNullOrEmpty(passwordTextBox.Text))
                 return;
 
-            var client = new PwnedPasswordsClient();
+            var client = new PwnedPasswordsClient(new HttpClient());
 
             UpdateStatus("Checking if pwned...");
 
             try
             {
-                var response = await client.GetHasBeenPwnedAsync(new HashedPassword(passwordTextBox.Text));
+                var response = await client.GetHasBeenPwnedAsync(passwordTextBox.Text);
 
                 if (response.IsPwned)
                 {
-                    MessageBox.Show($"Password has been pwned {response.Count} times before.", "Pwned Password", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show($"Password has been pwned {response.Count.ToString("N0")} times before.", "Pwned Password", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
                 else
                 {
